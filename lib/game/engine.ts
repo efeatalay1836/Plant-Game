@@ -24,6 +24,7 @@ export interface Player {
   id: string;
   name: string;
   isAI: boolean;
+  isYou: boolean;
   seat: number;
   tokens: number;
   plots: (Plant | null)[];
@@ -58,7 +59,7 @@ export function newPlayer(
 ): Player {
   const plots: (Plant | null)[] = Array(PLOT_COUNT).fill(null);
   for (let i = 0; i < STARTING_PLANTS; i++) plots[i] = newPlant(drawSpecies(rng));
-  return { id, name, isAI, seat, tokens: TOKENS_PER_ROUND, plots };
+  return { id, name, isAI, isYou: false, seat, tokens: TOKENS_PER_ROUND, plots };
 }
 
 export function newGame(

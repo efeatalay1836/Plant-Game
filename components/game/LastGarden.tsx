@@ -442,7 +442,7 @@ export default function LastGarden() {
   const start = useCallback((name: string, seats: Seat[], visibility: "open" | "private") => {
     const players = seats.map((s, i) =>
       newPlayer(`p${i + 1}`, s.isYou ? name : s.name, s.isAI, i + 1));
-    players.forEach((p, i) => { (p as Player & { isYou?: boolean }).isYou = seats[i].isYou; });
+    players.forEach((p, i) => { p.isYou = seats[i].isYou; });
     const game = newGame(players, visibility);
     setState(game);
     setMessage(`Spring begins. ${EVENTS[game.eventCode].name} — ${EVENTS[game.eventCode].text}`);
@@ -465,7 +465,7 @@ export default function LastGarden() {
     </div>;
   }
 
-  const you = state.players.find((p) => (p as Player & { isYou?: boolean }).isYou)!;
+  const you = state.players.find((p) => p.isYou)!;
   const opponents = state.players.filter((p) => p !== you);
   const season = seasonOfRound(state.round);
   const nextSeasonCode = SEASON_OF_ROUND[state.round] ?? null;
