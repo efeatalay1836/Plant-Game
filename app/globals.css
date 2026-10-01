@@ -134,7 +134,7 @@
    lot of small bespoke pieces that would be unreadable inline.
    ============================================================ */
 
-.tlg{
+.tlg,.tlg-tutorial{
   --ink:#12211C; --ink-deep:#0C1712;
   --panel:#1B2E27; --panel-hi:#243C33;
   --loam:#3B2F27; --loam-dark:#2B221C;
@@ -144,7 +144,8 @@
   --hairline:rgba(232,239,228,.14);
   --r-lg:18px; --r-md:12px; --r-sm:8px;
   --serif:"Fraunces",Georgia,serif;
-
+}
+.tlg{
   min-height:100vh;
   background:radial-gradient(120% 90% at 50% 0%,#1B3128 0%,var(--ink) 45%,var(--ink-deep) 100%);
   background-attachment:fixed;
@@ -346,4 +347,40 @@
 }
 @media (prefers-reduced-motion:reduce){
   .tlg *{animation:none!important;transition:none!important}
+}
+
+/* ---------- how to play ---------- */
+.tlg-howto-btn{display:inline-flex;align-items:center;gap:8px;margin:-14px 0 22px;min-height:44px;padding:10px 20px;background:var(--panel);border:1px solid var(--hairline);border-radius:99px;color:var(--parchment);font-size:14px;font-weight:500;cursor:pointer;transition:border-color .14s,background .14s}
+.tlg-howto-btn:hover{border-color:var(--leaf-dim);background:var(--panel-hi)}
+.tlg-howto-btn svg{width:18px;height:18px;color:var(--bloom)}
+
+/* The dialog is rendered outside .tlg, so it restates what it needs. */
+.tlg-tutorial{box-sizing:border-box;width:100%;max-width:min(440px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow-y:auto;gap:0;padding:clamp(16px,4vw,26px);background:linear-gradient(180deg,var(--panel) 0%,var(--ink) 100%);color:var(--parchment);border:1px solid var(--hairline);border-radius:var(--r-lg);box-shadow:0 24px 60px -12px rgba(0,0,0,.6)}
+.tlg-tutorial *{box-sizing:border-box}
+.tlg-tutorial :focus-visible{outline:2px solid var(--bloom);outline-offset:2px}
+.tlg-tut-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.tlg-tut-count{font-family:var(--serif);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tlg-tutorial .tlg-tut-skip{height:44px;padding:0 14px;color:var(--muted);font-size:14px;background:none}
+.tlg-tutorial .tlg-tut-skip:hover{color:var(--parchment);background:var(--panel-hi)}
+.tlg-tut-body{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 4px 6px;animation:tlg-tut-in .22s ease-out}
+.tlg-tut-art{display:grid;place-items:center;width:clamp(84px,24vw,104px);aspect-ratio:1;margin-bottom:18px;border-radius:50%;background:radial-gradient(circle at 50% 40%,var(--panel-hi) 0%,var(--ink-deep) 100%);border:1px solid var(--hairline);box-shadow:0 0 0 6px rgba(127,211,107,.06)}
+.tlg-tut-art svg{width:48%;height:48%;color:var(--leaf)}
+.tlg-tutorial .tlg-tut-title{font-family:var(--serif);font-size:clamp(21px,5.5vw,25px);font-weight:600;line-height:1.15;color:var(--parchment);margin:0 0 10px}
+.tlg-tutorial .tlg-tut-text{font-size:clamp(15px,3.9vw,16px);line-height:1.55;color:#C9D6C6;margin:0;max-width:34ch;min-height:6.2em}
+.tlg-tut-dots{display:flex;justify-content:center;gap:2px;margin:12px 0 10px}
+.tlg-tut-dot{display:grid;place-items:center;width:28px;height:28px;padding:0;background:none;border:none;border-radius:99px;cursor:pointer}
+.tlg-tut-dot span{display:block;width:8px;height:8px;border-radius:99px;background:var(--hairline);transition:width .2s,background .2s}
+.tlg-tut-dot:hover span{background:var(--muted)}
+.tlg-tut-dot[aria-current="step"] span{width:22px;background:var(--leaf)}
+.tlg-tut-nav{display:flex;gap:10px}
+.tlg-tutorial .tlg-tut-nav button{flex:1;height:48px;border-radius:99px;font-size:15px;font-weight:600}
+.tlg-tutorial .tlg-tut-back{background:none;border:1px solid var(--hairline);color:var(--parchment)}
+.tlg-tutorial .tlg-tut-back:hover{background:var(--panel-hi)}
+.tlg-tutorial .tlg-tut-back:disabled{opacity:.35}
+.tlg-tutorial .tlg-tut-next{background:var(--leaf);color:var(--ink)}
+.tlg-tutorial .tlg-tut-next:hover{background:#95E080}
+.tlg-tutorial .tlg-tut-nav svg{width:18px;height:18px}
+@keyframes tlg-tut-in{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .tlg-tut-body{animation:none}
 }

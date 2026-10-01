@@ -13,6 +13,7 @@ import {
   validateAction, type GameState, type Player, type Plant,
 } from "@/lib/game/engine";
 import { runAllAI } from "@/lib/game/ai";
+import HowToPlay from "@/components/tutorial/HowToPlay";
 import {
   ACTIONS, EVENTS, NEIGHBOURS, SEASON_OF_ROUND, SEASONS, SPECIES,
   TOTAL_ROUNDS, type ActionType, type SpeciesCode,
@@ -93,6 +94,7 @@ function Lobby({ onStart }: {
     <div className="tlg-lobby">
       <h1 className="tlg-wordmark"><span className="the">The</span>Last Garden</h1>
       <p className="tlg-tagline">One reservoir. Four gardens. Eight rounds until winter.</p>
+      <HowToPlay />
 
       <div className="tlg-card">
         <div className="tlg-field">
