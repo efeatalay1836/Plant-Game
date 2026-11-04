@@ -430,6 +430,14 @@ function Results({ state, onReplay }: { state: GameState; onReplay: () => void }
   );
 }
 
+import { SCENARIOS, scenarioGame, seededRng, type Scenario } from "../../lib/game/scenarios";
+
+// Research mode: switched on when the page is opened with ?scenario=<number>.
+let activeScenario: Scenario | null = null;
+let seedRng: () => number = Math.random;
+
+import { describeState } from "../../lib/game/describe";
+
 /* ---------------- main ---------------- */
 
 export default function LastGarden() {
@@ -442,12 +450,17 @@ export default function LastGarden() {
   const [flipping, setFlipping] = useState(false);
 
   const start = useCallback((name: string, seats: Seat[], visibility: "open" | "private") => {
-    const players = seats.map((s, i) =>
+    const id = new URLSearchParams(window.location.search).get("scenario");
+    activeScenario = id ? SCENARIOS[id] ?? null : null;
+    // In research mode the tested AI plays alone: computer players are removed.
+    const playSeats = activeScenario ? seats.filter((s) => s.isYou) : seats;
+    const players = playSeats.map((s, i) =>
       newPlayer(`p${i + 1}`, s.isYou ? name : s.name, s.isAI, i + 1));
-    players.forEach((p, i) => { p.isYou = seats[i].isYou; });
-    const game = newGame(players, visibility);
+    players.forEach((p, i) => { p.isYou = playSeats[i].isYou; });
+        seedRng = activeScenario ? seededRng(activeScenario.seed * 97) : Math.random;
+    const game = activeScenario ? scenarioGame(activeScenario, players, visibility) : newGame(players, visibility);
     setState(game);
-    setMessage(`Spring begins. ${EVENTS[game.eventCode].name} — ${EVENTS[game.eventCode].text}`);
+    setMessage(`${activeScenario ? `Scenario ${activeScenario.id}: ${activeScenario.name}. ` : ""}Spring begins. ${EVENTS[game.eventCode].name} — ${EVENTS[game.eventCode].text}`);
   }, []);
 
   const flash = (seat: number, idx: number, kind: string) => {
@@ -479,7 +492,7 @@ export default function LastGarden() {
   const handlePlotClick = (player: Player, index: number) => {
     // Acting on your own garden takes priority; otherwise it is an inspection.
     if (player === you && selectedAction) {
-      const species = selectedAction === "plant" ? (drawnSeed ?? drawSpecies()) : undefined;
+      const species = selectedAction === "plant" ? (drawnSeed ?? drawSpecies(seedRng)) : undefined;
       const request = { playerId: you.id, action: selectedAction, plot: index, species };
       const problem = validateAction(state, request);
       if (problem) { setMessage(problem); return; }
@@ -496,7 +509,7 @@ export default function LastGarden() {
 
   const handleEndRound = () => {
     let next = runAllAI(state);
-    const result = engineEndRound(next);
+    const result = engineEndRound(next, activeScenario ? seededRng(activeScenario.seed + next.round) : Math.random);
     for (const note of result.notes) {
       const player = state.players.find((p) => p.id === note.playerId);
       if (player === you) flash(player.seat, note.plot, note.kind === "grew" ? "grew" : "hurt");
@@ -522,7 +535,7 @@ export default function LastGarden() {
               onClick={() => {
                 const next = selectedAction === a.id ? null : a.id;
                 setSelectedAction(next);
-                if (next === "plant" && !drawnSeed) setDrawnSeed(drawSpecies());
+                if (next === "plant" && !drawnSeed) setDrawnSeed(drawSpecies(seedRng));
                 if (next) setMessage(`${a.label} — ${a.hint}. Choose a plot.`);
               }}>
               <Icon className="" path={ACTION_ICONS[a.id]} />
@@ -593,11 +606,11 @@ export default function LastGarden() {
             <p className="tlg-deck-title">Seeds</p>
             <div className="tlg-seed-stack" role="button" tabIndex={0}
               onClick={() => {
-                const s = drawSpecies();
+                const s = drawSpecies(seedRng);
                 setDrawnSeed(s);
                 setMessage(`You drew a ${SPECIES[s].name}. ${SPECIES[s].auraText} Choose an empty plot.`);
               }}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDrawnSeed(drawSpecies()); } }}>
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDrawnSeed(drawSpecies(seedRng)); } }}>
               <Icon className="" path='<path d="M12 20c0-5 3-9 8-10-1 6-4 9-8 10Z"/><path d="M12 20c0-4-2.5-7.5-7-8.5.8 5 3.5 7.8 7 8.5Z"/><path d="M12 20v-4"/>' stroke="#CFE8C2" />
             </div>
             <p className="tlg-deck-hint">{drawnSeed ? `${SPECIES[drawnSeed].name} ready` : "Click to draw"}</p>
@@ -644,6 +657,7 @@ export default function LastGarden() {
 
       <div className="tlg-turnbar">
         <p className="tlg-log">{message}</p>
+        <button className="tlg-end-round" type="button" onClick={() => { navigator.clipboard.writeText(describeState(state)).then(() => setMessage("Game state copied. Paste it into the AI chat.")).catch(() => setMessage("Could not copy. Try clicking the page first.")); }}>Copy state for AI</button>
         <button className="tlg-end-round" type="button" onClick={handleEndRound}>End round</button>
       </div>
     </div>
