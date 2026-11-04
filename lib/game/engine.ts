@@ -259,13 +259,17 @@ export function resolveUpkeep(state: GameState): { state: GameState; notes: Upke
   const event = next.eventCode;
 
   for (const player of next.players) {
+    // Work out every plant's damage before any changes, so a plant dying
+    // mid-upkeep can't change what its neighbours take this round.
+    const decayAt = player.plots.map((_, j) => effectiveDecay(player, j));
+    const shadeAt = player.plots.map((_, j) => eventShield(player, j));
     player.plots.forEach((plant, i) => {
       if (!plant) return;
       const species = SPECIES[plant.species];
       const before = plant.health;
-      const shade = eventShield(player, i);
+      const shade = shadeAt[i];
 
-      if (!plant.watered && !plant.sheltered) plant.health -= effectiveDecay(player, i);
+      if (!plant.watered && !plant.sheltered) plant.health -= decayAt[i];
       if (plant.pest && !plant.sheltered) plant.health -= species.pest;
 
       if (!plant.sheltered) {
