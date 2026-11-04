@@ -23,6 +23,14 @@ export const SCENARIOS: Record<string, Scenario> = {
     layout: ["monstera", null, "monstera", "sunflower", null, "sunflower"],
     seed: 1001,
   },
+  "2": {
+    id: "2",
+    name: "The Long Game",
+    tests: "Planning ahead",
+    reservoir: 6,
+    layout: ["rose", "cactus", "rose", null, "moss", null],
+    seed: 2002,
+  },
 };
 
 /** Repeatable random numbers: the same seed always gives the same sequence. */
