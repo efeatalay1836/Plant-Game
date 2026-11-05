@@ -332,6 +332,7 @@ export function refillReservoir(state: GameState): GameState {
 /** Ends the current round: upkeep, refill, then either advance or finish. */
 export function endRound(
   state: GameState, rng: () => number = Math.random,
+  forcedEvent?: (round: number) => string | undefined,
 ): { state: GameState; notes: UpkeepNote[] } {
   let { state: next, notes } = resolveUpkeep(state);
   next = refillReservoir(next);
@@ -343,7 +344,7 @@ export function endRound(
 
   next.round += 1;
   for (const player of next.players) player.tokens = TOKENS_PER_ROUND;
-  next = applyEventOnReveal(next, drawEvent(next.round, rng), rng);
+  next = applyEventOnReveal(next, forcedEvent?.(next.round) ?? drawEvent(next.round, rng), rng);
 
   return { state: next, notes };
 }

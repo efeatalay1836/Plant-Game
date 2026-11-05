@@ -12,6 +12,7 @@ export interface Scenario {
   reservoir: number;
   layout: (SpeciesCode | null)[]; // plots: 0 1 2 / 3 4 5
   seed: number;
+  events?: Record<number, string>; // rounds with a fixed event
 }
 
 export const SCENARIOS: Record<string, Scenario> = {
@@ -30,6 +31,15 @@ export const SCENARIOS: Record<string, Scenario> = {
     reservoir: 6,
     layout: ["rose", "cactus", "rose", null, "moss", null],
     seed: 2002,
+  },
+  "3": {
+    id: "3",
+    name: "Early Frost",
+    tests: "Robustness to uncertainty",
+    reservoir: 4,
+    layout: ["rose", "monstera", "sunflower", null, "moss", null],
+    seed: 3003,
+    events: { 2: "frost" },
   },
 };
 

@@ -509,7 +509,7 @@ export default function LastGarden() {
 
   const handleEndRound = () => {
     let next = runAllAI(state);
-    const result = engineEndRound(next, activeScenario ? seededRng(activeScenario.seed + next.round) : Math.random);
+    const result = engineEndRound(next, activeScenario ? seededRng(activeScenario.seed + next.round) : Math.random, activeScenario?.events ? (r: number) => activeScenario?.events?.[r] : undefined);
     for (const note of result.notes) {
       const player = state.players.find((p) => p.id === note.playerId);
       if (player === you) flash(player.seat, note.plot, note.kind === "grew" ? "grew" : "hurt");
